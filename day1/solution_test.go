@@ -1,6 +1,24 @@
 package day1
 
-import "testing"
+import (
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+    "testing"
+)
+
+
+func loadInput() string {
+    _, file, _, _ := runtime.Caller(0)
+    path := filepath.Dir(file)
+    content, err := os.ReadFile(filepath.Join(path, "input.txt"))
+    if err != nil {
+        log.Fatal(err)
+    }
+    return string(content)
+}
+
 
 func TestPart1(t *testing.T) {
     input := loadInput()

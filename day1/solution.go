@@ -37,25 +37,6 @@
 
 package day1
 
-import (
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
-)
-
-
-
-func loadInput() string {
-    _, file, _, _ := runtime.Caller(0)
-    path := filepath.Dir(file)
-    content, err := os.ReadFile(filepath.Join(path, "input.txt"))
-    if err != nil {
-        log.Fatal(err)
-    }
-    return string(content)
-}
-
 
 func part1(input string) int32 {
     var floor int32 = 0
