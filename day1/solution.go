@@ -68,3 +68,19 @@ func part1(input string) int32 {
     }
     return floor
 }
+
+
+func part2(input string) (int, bool) {
+    var floor int32 = 0
+    for i, c := range input {
+        if c == '(' {
+            floor += 1
+        } else if c == ')' {
+            floor -= 1
+        }
+        if floor < 0 {
+            return i+1, true
+        }
+    }
+    return 0, false
+}

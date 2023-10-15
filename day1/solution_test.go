@@ -9,3 +9,15 @@ func TestPart1(t *testing.T) {
         t.Errorf("Expected 232, got %d", output)
     }
 }
+
+
+func TestPart2(t *testing.T) {
+    input := loadInput()
+    output, ok := part2(input)
+    if !ok {
+        t.Error("santa never entered the basement")
+    }
+    if output != 1783 {
+        t.Errorf("Expected 1783, got %d", output)
+    }
+}
