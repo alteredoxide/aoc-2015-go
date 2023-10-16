@@ -57,3 +57,16 @@ func TestPart1(t *testing.T) {
         t.Errorf("expected 1606483 but got %d", output)
     }
 }
+
+
+func TestPart2(t *testing.T) {
+    input, err := loadInput()
+    if err != nil {
+        t.Error(err)
+    }
+    output := part2(input)
+    expected := 3842356
+    if output != expected {
+        t.Errorf("expected %d but got %d", expected, output)
+    }
+}
