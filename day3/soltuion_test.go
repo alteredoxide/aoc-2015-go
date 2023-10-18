@@ -30,3 +30,16 @@ func TestPart1(t *testing.T) {
         t.Fatalf("exptected %d but found %d", expected, output)
     }
 }
+
+
+func TestPart2(t *testing.T) {
+    input, err := loadInput()
+    if err != nil {
+        t.Fatal(err)
+    }
+    output := part2(input)
+    var expected int = 2639
+    if output != expected {
+        t.Fatalf("expected %d but found %d", expected, output)
+    }
+}
