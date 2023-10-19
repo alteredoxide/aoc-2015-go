@@ -23,10 +23,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+	"sync"
+	"sync/atomic"
 )
 
 
-func part1(input string, prefix string) int {
+func partOneOrTwo(input string, prefix string) int {
     input = strings.Trim(input, "\n")
     var i int = 0
     for {
@@ -37,4 +39,40 @@ func part1(input string, prefix string) int {
         }
         i += 1
     }
+}
+
+
+func worker(input string, prefix string, done *int32, tx chan<- int) {
+    input = strings.Trim(input, "\n")
+    var i int = 0
+    for {
+        if atomic.LoadInt32(done) == 1 {
+            break
+        }
+        hash := md5.Sum([]byte(fmt.Sprintf("%s%d", input, i)))
+        encoded := hex.EncodeToString(hash[:])
+        if strings.HasPrefix(encoded, prefix) {
+            tx <- i
+        }
+        i += 1
+    }
+}
+
+
+func parallelSolution(input string, prefix string, nThreads int) int {
+    results := make(chan int)
+    var done int32
+    atomic.StoreInt32(&done, 0)
+    var wg sync.WaitGroup
+    // start workers
+    for i := 0; i < nThreads; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            worker(input, prefix, &done, results)
+        }()
+    }
+    answer := <-results
+    atomic.StoreInt32(&done, 1)
+    return answer
 }

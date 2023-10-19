@@ -25,8 +25,37 @@ func TestPart1(t *testing.T) {
         t.Fatal(err)
     }
     prefix := "00000"
-    output := part1(input, prefix)
+    output := partOneOrTwo(input, prefix)
     expected := 254575
+    if output != expected {
+        t.Fatalf("expected %d but found %d", expected, output)
+    }
+}
+
+
+func TestPart2(t *testing.T) {
+    input, err := loadInput()
+    if err != nil {
+        t.Fatal(err)
+    }
+    prefix := "000000"
+    output := partOneOrTwo(input, prefix)
+    expected := 1038736
+    if output != expected {
+        t.Fatalf("expected %d but found %d", expected, output)
+    }
+}
+
+
+func TestPart2Par(t *testing.T) {
+    input, err := loadInput()
+    if err != nil {
+        t.Fatal(err)
+    }
+    prefix := "000000"
+    nThreads := 8
+    output := parallelSolution(input, prefix, nThreads)
+    expected := 1038736
     if output != expected {
         t.Fatalf("expected %d but found %d", expected, output)
     }
