@@ -41,3 +41,15 @@ func TestPart1(t *testing.T) {
         t.Fatalf("expected %d but got %d", expected, output)
     }
 }
+
+func TestPart1BitKernighanArray(t *testing.T) {
+    input, err := loadInput()
+    if err != nil {
+        t.Fatal(err)
+    }
+    output := partOneBitKernighanArray(input)
+    expected := 400410
+    if output != expected {
+        t.Fatalf("expected %d but got %d", expected, output)
+    }
+}

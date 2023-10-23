@@ -30,6 +30,7 @@ package day6
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
@@ -140,4 +141,169 @@ func partOne(input []string) int {
         }
     }
     return count
+}
+
+
+func flatIdx(row int, col int, nCols int) int {
+    idx := row * nCols + col
+    return idx
+}
+
+
+// Use a bitset and Kernighan's algorithm to count active bits.
+// NOTE: this uses `math/big.Int` which, unless I'm not using it correctly, is HORRIBLY
+// slow for the counting algorithm.
+//
+// TODO: try this approach without big Int: use an array of uint8 or other primitive
+func partOneBitKernighan(input []string) int {
+    instructions := instructionsFromInput(input)
+    // init the lights bitset
+    lights := big.NewInt(0)
+    nCols := 1000
+    for _, inst := range instructions {
+        rowI := inst.coords[0][0]
+        rowF := inst.coords[1][0]
+        colI := inst.coords[0][1]
+        colF := inst.coords[1][1]
+        for r := rowI; r <= rowF; r++ {
+            for x := colI; x <= colF; x++ {
+                pos := flatIdx(r, x, nCols)
+                switch inst.action {
+                case Off:
+                    lights.SetBit(lights, pos, 0)
+                case On:
+                    lights.SetBit(lights, pos, 1)
+                case Toggle:
+                    // masking is too inefficient; use an explicit/manual approach
+                    switch lights.Bit(pos) {
+                    case 0:
+                        lights.SetBit(lights, pos, 1)
+                    case 1:
+                        lights.SetBit(lights, pos, 0)
+                    }
+                }
+            }
+        }
+    }
+    count := 0
+    zero := big.NewInt(0)
+    one := big.NewInt(1)
+    tmp := new(big.Int)
+    for lights.Cmp(zero) > 0 {
+        count++
+        tmp.Sub(lights, one)
+        lights.And(lights, tmp)
+    }
+    return count
+}
+
+
+func setBit(array []uint8, pos int, active bool) {
+    byte := pos / 8
+    pos = pos % 8
+    switch active {
+    case true:
+        array[byte] = array[byte] | (1 << pos)
+    case false:
+        array[byte] = array[byte] & ^(1 << pos)
+    }
+}
+
+
+func getBit(array []uint8, pos int) uint {
+    byte := pos / 8
+    pos = pos % 8
+    return uint((array[byte] & (1 << pos)) >> pos)
+}
+
+
+// This avoids the use of big Int by manually creating a slice of `uint8` and writing some
+// custom code:
+// - set and get bit functions
+// - nested Kernighan loops (one for each byte in the custom bitset)
+// NOTE: This is MUCH faster than using Go's big Int. Again, maybe I wasn't using it
+// in an optimal way? Idk.
+func partOneBitKernighanArray(input []string) int {
+    instructions := instructionsFromInput(input)
+    // init the lights bitset
+    lights := []uint8{}
+    for i := 0; i < 1000000/8; i++ {
+        lights = append(lights, 0)
+    }
+    nCols := 1000
+    for _, inst := range instructions {
+        rowI := inst.coords[0][0]
+        rowF := inst.coords[1][0]
+        colI := inst.coords[0][1]
+        colF := inst.coords[1][1]
+        for r := rowI; r <= rowF; r++ {
+            for x := colI; x <= colF; x++ {
+                pos := flatIdx(r, x, nCols)
+                switch inst.action {
+                case Off:
+                    setBit(lights, pos, false)
+                case On:
+                    setBit(lights, pos, true)
+                case Toggle:
+                    // masking is too inefficient; use an explicit/manual approach
+                    switch getBit(lights, pos) {
+                    case 0:
+                        setBit(lights, pos, true)
+                    case 1:
+                        setBit(lights, pos, false)
+                    }
+                }
+            }
+        }
+    }
+    count := 0
+    for _, byte := range lights {
+        for byte > 0 {
+            count++
+            byte = byte & (byte - 1)
+        }
+    }
+    return count
+}
+
+
+// Use a bitset and manually iterating over bits to count ones.
+// NOTE: even though it's using a big Int for the bitset, this is A LOT faster
+// than using Kernighan's algorithm on the big Int: `partOneBitKernighan()`
+// NOTE: this is about 3x slower than `partOneBitKernighanArray()`
+func partOneBitIter(input []string) int {
+    instructions := instructionsFromInput(input)
+    // init the lights bitset
+    lights := big.NewInt(0)
+    nCols := 1000
+    for _, inst := range instructions {
+        rowI := inst.coords[0][0]
+        rowF := inst.coords[1][0]
+        colI := inst.coords[0][1]
+        colF := inst.coords[1][1]
+        for r := rowI; r <= rowF; r++ {
+            for x := colI; x <= colF; x++ {
+                pos := flatIdx(r, x, nCols)
+                switch inst.action {
+                case Off:
+                    lights.SetBit(lights, pos, 0)
+                case On:
+                    lights.SetBit(lights, pos, 1)
+                case Toggle:
+                    // masking is too inefficient; use an explicit/manual approach
+                    switch lights.Bit(pos) {
+                    case 0:
+                        lights.SetBit(lights, pos, 1)
+                    case 1:
+                        lights.SetBit(lights, pos, 0)
+                    }
+                }
+            }
+        }
+    }
+    var count uint = 0
+    for b := 0; b < lights.BitLen(); b++ {
+        count += lights.Bit(b)
+    }
+    return int(count)
 }
