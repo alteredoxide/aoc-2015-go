@@ -43,3 +43,16 @@ func TestPart1(t *testing.T) {
         t.Fatalf("expected %d but got %d", expected, output)
     }
 }
+
+
+func TestPartTwo(t *testing.T) {
+    input, err := loadInput()
+    if err != nil {
+        t.Fatal(err)
+    }
+    output := partTwo(input)
+    expected := 53
+    if output != expected {
+        t.Fatalf("expected %d but got %d", expected, output)
+    }
+}

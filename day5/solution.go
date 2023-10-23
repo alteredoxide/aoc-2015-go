@@ -21,6 +21,29 @@
 // - `dvszwmarrgswjxmb` is naughty because it contains only one vowel.
 //
 // How many strings are nice?
+//
+// --- Part Two ---
+// Realizing the error of his ways, Santa has switched to a better model of determining
+// whether a string is naughty or nice. None of the old rules apply, as they are all
+// clearly ridiculous.
+// 
+// Now, a nice string is one with all of the following properties:
+// 
+// - It contains a pair of any two letters that appears at least twice in the string without overlapping, like xyxy (xy) or aabcdefgaa (aa), but not like aaa (aa, but it overlaps).
+// - It contains at least one letter which repeats with exactly one letter between them, like xyx, abcdefeghi (efe), or even aaa.
+// 
+// For example:
+// 
+// - `qjhvhtzxzqqjkmpb` is nice because is has a pair that appears twice (`qj`) and a letter
+//   that repeats with exactly one letter between them (`zxz`).
+// - `xxyxx` is nice because it has a pair that appears twice and a letter that repeats
+//   with one between, even though the letters used by each rule overlap.
+// - `uurcxstgmygtbstg` is naughty because it has a pair (`tg`) but no repeat with a
+//   single letter between them.
+// - `ieodomkazucvgmuy` is naughty because it has a repeating letter with one between
+//   (`odo`), but no pair that appears twice.
+//
+// How many strings are nice under these new rules?
 
 package day5
 
@@ -78,6 +101,48 @@ func partOne(input []string) int {
     var nNice int = 0
     for _, s := range input {
         if hasThreeVowels(s) && hasDouble(s) && !hasNaughtySeq(s) {
+            nNice += 1
+        }
+    }
+    return nNice
+}
+
+
+// ==== Part Two
+
+func pairTwiceWithoutOverlap(s string) bool {
+    pairs := map[string]bool{}
+    for i := 0; i < len(s) - 1; i++ {
+        pair := s[i:i+2]
+        if i > 0 {
+            if s[i-1:i+1] == pair {
+                continue
+            }
+        }
+        if pairs[pair] {
+            return true
+        }
+        pairs[pair] = true
+    }
+    return false
+}
+
+
+func hasSandwich(s string) bool {
+    for i := 0; i < len(s) - 2; i++ {
+        triple := s[i:i+3]
+        if triple[0] == triple[2] {
+            return true
+        }
+    }
+    return false
+}
+
+
+func partTwo(input []string) int {
+    var nNice int = 0
+    for _, s := range input {
+        if pairTwiceWithoutOverlap(s) && hasSandwich(s) {
             nNice += 1
         }
     }
