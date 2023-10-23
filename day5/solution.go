@@ -75,11 +75,11 @@ func hasNaughtySeq(s string) bool {
 
 
 func partOne(input []string) int {
-    var n_nice int = 0
+    var nNice int = 0
     for _, s := range input {
         if hasThreeVowels(s) && hasDouble(s) && !hasNaughtySeq(s) {
-            n_nice += 1
+            nNice += 1
         }
     }
-    return n_nice
+    return nNice
 }
